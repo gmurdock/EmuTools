@@ -43,8 +43,6 @@ UI.SetFont("s10 cWhite", "Segoe UI")
 
 ; Browser selection
 UI.Add("Text", "y+10 cSilver", "Select your browser:")
-;browserDropdown := UI.Add("DropDownList", "vBrowserChoice w120 Background0x2a2a2a cWhite", ["Chrome", "Edge", "Firefox", "Brave"])
-;browserDropdown.Value := browserDropdown.Choose(savedBrowser)
 
 ; Define the browser list
 browserList := ["Chrome", "Edge", "Firefox", "Brave"]
@@ -86,31 +84,88 @@ focusGroup := UI.Add("Radio", "vFocusStop Checked cWhite", "Stop sequence")
 UI.Add("Radio", "cWhite", "Pause and resume")
 
 ; Progress display
-progressText := UI.Add("Text", "w300 cSilver", "")
+progressText := UI.Add("Text", "x290 y+20 w240 Background0x333333 cSilver", "")
 
 ; Buttons
-;UI.Add("Button", "Default w80 Background0x444444 cWhite", "Execute").OnEvent("Click", StartSequence)
-;UI.Add("Button", "w80 x+10 Background0x444444 cWhite", "Stop").OnEvent("Click", StopSequence)
-UI.Add("Button", "x451 y247 w80 h29 Background0x444444 cWhite", "Execute").OnEvent("Click", StartSequence)
-UI.Add("Button", "x451 y280 w80 h29 Background0x444444 cWhite", "Stop").OnEvent("Click", StopSequence)
+UI.Add("Button", "x454 y244 w80 h29 Background0x444444 cWhite", "Execute").OnEvent("Click", StartSequence)
+UI.Add("Button", "x454 y277 w80 h29 Background0x444444 cWhite", "Stop").OnEvent("Click", StopSequence)
+
+; Cheats Folder
+UI.SetFont("s8", "Segoe UI")  ; Override font size
+openCheatsBtn := UI.Add("Button", "x177 y317 w100 h29 Background0x333333 cWhite Center", "Open Cheats`nFolder")
+openCheatsBtn.OnEvent("Click", OpenCheatsFolder)
+UI.SetFont("s10 cWhite", "Segoe UI")  ; Restore font size
 
 ; Logo
 UI.Add("Text", "y+15")  ; Spacer
 if FileExist(A_ScriptDir "\assets\logo.png") {
-	logo := UI.Add("Picture", "x7 y71 w268 h229 Center", A_ScriptDir "\assets\logo.png")
+	logo := UI.Add("Picture", "x7 y77 w268 h229 Center", A_ScriptDir "\assets\logo.png")
 	logo.OnEvent("Click", ShowCredits)
 }
 
 ; Draw the UI
-UI.Show("w549 h320")
+UI.Show("w550 h360")
+
+OpenCheatsFolder(*) {
+	; Check if user has saved a custom path
+	prefDir := IniRead(iniPath, "Paths", "CheatsFolder", "")
+	if (prefDir != "" && DirExist(prefDir)) {
+		Run prefDir
+		return
+	}
+	
+	; If saved path is invalid, clean up and notify
+	if (prefDir != "") {
+		IniDelete(iniPath, "Paths", "CheatsFolder")
+		MsgBox "
+		(
+The previously saved cheats folder path was not found and has been removed:
+	
+	%prefDir%
+	
+Please select a new folder.
+		)", "Folder Not Found", "0x40010"
+	}
+	
+	; Default path in documents
+	defaultDir := A_MyDocuments "\PCSX2\cheats"
+	if DirExist(defaultDir) {
+		Run defaultDir
+		return
+	}
+	; Prompt user to select manually
+	selectDir := ""
+	selectDir := DirSelect("Select your PCSX2 cheats folder", A_MyDocuments)
+	if selectDir {
+		IniWrite(selectDir, iniPath, "Paths", "CheatsFolder")
+		Run selectDir
+	}
+}
 
 StartSequence(*) {
 	global isRunning := true
 	global stopOnFocusLoss := focusGroup.Value = 1
 
+	; Validate cheat codes input
+	if !RegExMatch(input.Value, "^\d+$") {
+		MsgBox "Please enter a valid integer for total cheats to select.", "Input Error", "0x40000"
+		return
+	}
 	num := Integer(input.Value)
-	masters := Integer(masterInput.Value)
 
+	; Validate optional master codes input
+	masters := 0
+	if masterInput.Value != "" {
+		if !RegExMatch(masterInput.Value, "^\d+$") {
+			MsgBox "Master Codes input is optional, or be a valid integer.", "Input Error", "0x40000"
+			return
+		}
+		masters := Integer(masterInput.Value)
+	}
+	
+	;num := Integer(input.Value)
+	;masters := Integer(masterInput.Value)
+	
 	if num < 1 {
 		MsgBox "Please enter a valid positive integer for checkbox count.", "Input Error", "0x40000"
 		return
@@ -137,9 +192,7 @@ StartSequence(*) {
 	hwnd := matches[1]
 	hwnd_id := "ahk_id " . hwnd
 	WinActivate(hwnd_id)
-	Sleep 300
-
-	Sleep 5000
+	Sleep 500
 
 	Loop num {
 		if !isRunning {
@@ -150,9 +203,9 @@ StartSequence(*) {
 		if WinActive(hwnd_id) {
 			tabCount := (A_Index <= masters) ? 2 : 3
 			Send "{Tab " tabCount "}"
-			Sleep 50
+			Sleep 10
 			Send " "
-			Sleep 50
+			Sleep 10
 			progressText.Text := "Selected " A_Index " of " num
 		} else {
 			if stopOnFocusLoss {
@@ -202,11 +255,23 @@ LaunchSite(*) {
 
 	exe := exeMap[browser]
 
-	; Check if the browser executable is available
 	try {
-		Run '"' exe '" --version', , "Hide"
-	} catch {
-		MsgBox "Could not find the selected browser executable:`n" exe "`n`nPlease ensure it is installed and available in your system PATH.", "Browser Not Found", "0x40010"
+		; Launch browser with URL
+		if ProcessExist(exe) {
+			switch exe {
+				case "chrome.exe", "brave.exe", "msedge.exe":
+					Run '"' exe '" --new-tab "' url '"'
+				case "firefox.exe":
+					Run '"' exe '" -new-tab "' url '"'
+				default:
+					Run '"' exe '" "' url '"'  ; Fallback
+			}
+		} else {
+			Run '"' exe '" "' url '"'  ; Launch new instance
+		}
+	}
+	catch {
+		MsgBox "Could not find or launch the selected browser executable:`n" exe "`n`nPlease check browser selection is installed on this system.", "Browser Not Found", "0x40010"
 		return
 	}
 
@@ -214,9 +279,6 @@ LaunchSite(*) {
 	flagShowInstructions := showInstructionsToggle.Value
 	IniWrite(flagShowInstructions ? "true" : "false", iniPath, "Preferences", "ShowInstructions")
 	IniWrite(browser, iniPath, "Preferences", "LastBrowser")
-
-	; Launch browser with URL
-	Run '"' exe '" "' url '"'
 
 	if flagShowInstructions {
 		ShowInstructions()

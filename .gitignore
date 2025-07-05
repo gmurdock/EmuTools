@@ -1,0 +1,14 @@
+# Ignore compiled executables
+*.exe
+
+# Ignore local settings
+Settings.ini
+
+# Ignore backup or temp files
+*.bak
+*.tmp
+
+# Ignore editor-specific folders
+.vscode/
+.idea/
+.drafts/
