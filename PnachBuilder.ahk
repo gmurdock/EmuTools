@@ -43,8 +43,6 @@ UI.SetFont("s10 cWhite", "Segoe UI")
 
 ; Browser selection
 UI.Add("Text", "y+10 cSilver", "Select your browser:")
-;browserDropdown := UI.Add("DropDownList", "vBrowserChoice w120 Background0x2a2a2a cWhite", ["Chrome", "Edge", "Firefox", "Brave"])
-;browserDropdown.Value := browserDropdown.Choose(savedBrowser)
 
 ; Define the browser list
 browserList := ["Chrome", "Edge", "Firefox", "Brave"]
