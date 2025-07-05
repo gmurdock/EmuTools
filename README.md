@@ -23,5 +23,5 @@ For use in creating your own .pnach files without the hassle of manually selecti
 5. Click "Execute" to automate the process
 
 ## Credits
-Made by Gary Murdock
+Made by Gary Murdock,
 Logo and design inspired by PCSX2 and AR MAX aesthetics
