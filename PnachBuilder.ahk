@@ -1,6 +1,6 @@
 ﻿; Pnach Builder - A cheat automation tool for PCSX2
 ; Part of the EmuTools repository
-; https://github.com/gdmurdock/EmuTools
+; https://github.com/gmurdock/EmuTools
 ;
 ; Copyright (C) 2025 Gary Murdock
 ;
