@@ -1,4 +1,5 @@
 ## EmuTools
+![GitHub release (latest by tag)](https://img.shields.io/github/v/tag/gmurdock/EmuTools?label=version)
 
 **EmuTools** is a curated collection of lightweight, purpose-built utilities designed to enhance the experience of using emulation software and contribute to the broader game preservation scene.
 
