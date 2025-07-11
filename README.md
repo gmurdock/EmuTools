@@ -54,5 +54,4 @@ Feel free to fork the repo, open issues, or submit pull requests.
 Created by **Gary Murdock**  
 Focused on building reliable, adaptable, and user-centric tools for the emulation community.
 
----
-[![Donate](https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW51Ynk5emFqcTI3dWlraDA5b3R1ZXg0bHhmaHFmMGV6cHY0MmVuNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/7kZE0z52Sd9zSESzDA/giphy.gif)](https://www.buymeacoffee.com/gmurdock)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/gmurdock)
